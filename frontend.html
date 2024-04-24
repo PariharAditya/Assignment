@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    #weatherForm {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      text-align: center;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    #weatherData {
+      margin-top: 50px;
+      font-size: 20px;
+      text-align: center;
+      animation: fadeIn 2s;
+    }
+
+    label, input[type="text"], input[type="submit"] {
+      margin: 10px;
+    }
+    input[type="text"], input[type="submit"] {
+      padding: 10px;
+      font-size: 16px;
+    }
+    input[type="submit"] {
+      cursor: pointer;
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+    }
+    #weatherData {
+      margin-top: 50px;
+      font-size: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Weather App</h2>
+
+<form id="weatherForm">
+  <label for="city">City:</label><br>
+  <input type="text" id="city" name="city"><br>
+  <input type="submit" value="Get Weather">
+</form>
+
+<p id="weatherData"></p>
+
+<script>
+  document.getElementById('weatherForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var city = document.getElementById('city').value;
+    fetch('http://localhost:5000/weather?city=' + city)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      }).then(data => {
+        if (!data.main) {
+          document.getElementById('weatherData').innerHTML = 'Please enter correct city name.';
+          return;
+        }
+        var cityName = data.name;
+        var temperatureK = data.main.temp;
+        var temperatureC = temperatureK - 273.15; // Convert to Celsius
+        var description = data.weather[0].description;
+        var icon = data.weather[0].icon;
+        document.getElementById('weatherData').innerHTML = 
+          'City: ' + cityName + '<br>' +
+          'Temperature: ' + temperatureC.toFixed(2) + '°C<br>' +
+          'Weather: ' + description + ' <img src="http://openweathermap.org/img/w/' + icon + '.png">';
+      })
+      .catch(error => console.error('There has been a problem with your fetch operation:', error));
+  });
+</script>
+
+</body>
+</html>
